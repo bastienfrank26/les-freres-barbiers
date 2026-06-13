@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Mode sombre piloté par la classe .dark (sur <html>) — utilisé par la console /admin */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root{
   --ink:#211710;          /* near-black espresso */
   --brown:#33220f;        /* deep wood */

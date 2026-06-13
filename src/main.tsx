@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
+import { applyTheme, getTheme } from './lib/theme'
 import { AuthProvider } from './auth/AuthProvider'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { Login } from './admin/Login'
@@ -12,6 +13,8 @@ import { Clients } from './admin/pages/Clients'
 import { Services } from './admin/pages/Services'
 import { Barbiers } from './admin/pages/Barbiers'
 import { Parametres } from './admin/pages/Parametres'
+
+applyTheme(getTheme())
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

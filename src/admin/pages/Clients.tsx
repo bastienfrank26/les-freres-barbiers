@@ -41,7 +41,7 @@ function toInput(d: Draft): ClientInput {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20'
+  'mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100'
 
 function ClientForm({
   initial,
@@ -91,52 +91,52 @@ function ClientForm({
       <form
         onSubmit={onSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-stone-800"
       >
-        <h2 className="text-lg font-semibold text-stone-800">
+        <h2 className="text-lg font-semibold text-stone-800 dark:text-stone-100">
           {initial ? 'Modifier le client' : 'Nouveau client'}
         </h2>
 
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700">Prénom</label>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Prénom</label>
             <input className={inputClass} value={draft.first_name} onChange={(e) => set('first_name', e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700">Nom</label>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Nom</label>
             <input className={inputClass} value={draft.last_name} onChange={(e) => set('last_name', e.target.value)} />
           </div>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700">Téléphone</label>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Téléphone</label>
             <input className={inputClass} type="tel" value={draft.phone} onChange={(e) => set('phone', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700">Courriel</label>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Courriel</label>
             <input className={inputClass} type="email" value={draft.email} onChange={(e) => set('email', e.target.value)} />
           </div>
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-stone-700">Notes internes</label>
+          <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Notes internes</label>
           <textarea className={inputClass} rows={3} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
         </div>
 
         {initial && (
           <div className="mt-5">
-            <h3 className="text-sm font-medium text-stone-700">Historique des rendez-vous</h3>
+            <h3 className="text-sm font-medium text-stone-700 dark:text-stone-300">Historique des rendez-vous</h3>
             {history.length === 0 ? (
               <p className="mt-1 text-sm text-stone-400">Aucun rendez-vous.</p>
             ) : (
               <ul className="mt-2 max-h-40 space-y-1 overflow-auto text-sm">
                 {history.map((a) => (
-                  <li key={a.id} className="flex justify-between gap-3 rounded-lg bg-stone-50 px-3 py-1.5">
-                    <span className="text-stone-600">
+                  <li key={a.id} className="flex justify-between gap-3 rounded-lg bg-stone-50 px-3 py-1.5 dark:bg-stone-700">
+                    <span className="text-stone-600 dark:text-stone-300">
                       {formatLongDate(new Date(a.starts_at))} · {hm(new Date(a.starts_at))}
                     </span>
-                    <span className="shrink-0 text-stone-500">
+                    <span className="shrink-0 text-stone-500 dark:text-stone-400">
                       {a.service?.name ?? ''} · {STATUS_LABELS[a.status]}
                     </span>
                   </li>
@@ -221,8 +221,8 @@ export function Clients() {
     <div>
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-800">Clients</h1>
-          <p className="mt-1 text-sm text-stone-500">
+          <h1 className="text-2xl font-semibold text-stone-800 dark:text-stone-100">Clients</h1>
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
             {clients.length} client{clients.length > 1 ? 's' : ''} · coordonnées et notes internes.
           </p>
         </div>
@@ -238,14 +238,14 @@ export function Clients() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Rechercher par nom, téléphone ou courriel…"
-        className="mt-6 w-full max-w-md rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20"
+        className="mt-6 w-full max-w-md rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100"
       />
 
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-800">
         <table className="w-full text-sm">
-          <thead className="bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500">
+          <thead className="bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500 dark:bg-stone-900 dark:text-stone-400">
             <tr>
               <th className="px-4 py-3 font-medium">Nom</th>
               <th className="px-4 py-3 font-medium">Téléphone</th>
@@ -254,7 +254,7 @@ export function Clients() {
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100">
+          <tbody className="divide-y divide-stone-100 dark:divide-stone-700">
             {loading ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-stone-400">
@@ -270,10 +270,10 @@ export function Clients() {
             ) : (
               filtered.map((c) => (
                 <tr key={c.id}>
-                  <td className="px-4 py-3 font-medium text-stone-800">{clientFullName(c)}</td>
-                  <td className="px-4 py-3 text-stone-500">{c.phone ?? '—'}</td>
-                  <td className="px-4 py-3 text-stone-500">{c.email ?? '—'}</td>
-                  <td className="max-w-xs truncate px-4 py-3 text-stone-500">{c.notes ?? '—'}</td>
+                  <td className="px-4 py-3 font-medium text-stone-800 dark:text-stone-100">{clientFullName(c)}</td>
+                  <td className="px-4 py-3 text-stone-500 dark:text-stone-400">{c.phone ?? '—'}</td>
+                  <td className="px-4 py-3 text-stone-500 dark:text-stone-400">{c.email ?? '—'}</td>
+                  <td className="max-w-xs truncate px-4 py-3 text-stone-500 dark:text-stone-400">{c.notes ?? '—'}</td>
                   <td className="px-4 py-3 text-right">
                     <button onClick={() => setEditing(c)} className="text-amber-800 hover:underline">
                       Modifier

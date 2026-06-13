@@ -2,18 +2,19 @@ import { supabase } from './supabase'
 import { dayConfig, isClosedByClosure } from './businessHours'
 import type { BusinessHour, Closure } from './businessHours'
 
-export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
+export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show' | 'paid'
 export type AppointmentSource = 'online' | 'internal'
 
 export type AppointmentInput = {
   client_id: string | null
-  service_id: string
+  service_id: string | null
   barber_id: string
   starts_at: string
   ends_at: string
   status: AppointmentStatus
   source: AppointmentSource
   notes: string | null
+  is_block: boolean
 }
 
 /** Rendez-vous avec ses relations jointes (pour l'affichage). */
@@ -70,6 +71,7 @@ export const STATUS_LABELS: Record<AppointmentStatus, string> = {
   cancelled: 'Annulé',
   completed: 'Terminé',
   no_show: 'Absence',
+  paid: 'Payé',
 }
 
 /**

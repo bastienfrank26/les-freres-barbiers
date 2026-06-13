@@ -56,15 +56,15 @@ export function WeekDayGrid({
   }
 
   return (
-    <div className="overflow-auto rounded-2xl border border-stone-200 bg-white">
+    <div className="overflow-auto rounded-2xl border border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-800">
       <div className="min-w-[680px]">
         {/* En-têtes de jours */}
-        <div className="grid border-b border-stone-200" style={{ gridTemplateColumns: cols }}>
+        <div className="grid border-b border-stone-200 dark:border-stone-700" style={{ gridTemplateColumns: cols }}>
           <div />
           {days.map((d) => {
             const today = sameDay(d, new Date())
             return (
-              <div key={d.toISOString()} className={`px-2 py-2 text-center text-sm ${today ? 'text-amber-800' : 'text-stone-600'}`}>
+              <div key={d.toISOString()} className={`px-2 py-2 text-center text-sm ${today ? 'text-amber-800 dark:text-amber-500' : 'text-stone-600 dark:text-stone-300'}`}>
                 <div className="font-medium">{DAY_LABELS_SHORT[weekdayIndex(d)]}</div>
                 <div className={`text-xs ${today ? 'font-semibold' : 'text-stone-400'}`}>{d.getDate()}</div>
               </div>
@@ -78,7 +78,7 @@ export function WeekDayGrid({
           {rows.map((min, r) => (
             <div
               key={`t-${min}`}
-              className="border-r border-stone-200 pr-2 pt-1 text-right text-xs text-stone-400"
+              className="border-r border-stone-200 pr-2 pt-1 text-right text-xs text-stone-400 dark:border-stone-700"
               style={{ gridColumn: 1, gridRow: r + 1 }}
             >
               {minutesToTime(min)}
@@ -93,7 +93,7 @@ export function WeekDayGrid({
                 <div
                   key={`c-${c}-${min}`}
                   style={{ gridColumn: c + 2, gridRow: r + 1 }}
-                  className={`border-b border-r border-stone-100 ${closed ? 'bg-stone-100' : 'cursor-pointer hover:bg-amber-50'}`}
+                  className={`border-b border-r border-stone-100 dark:border-stone-700/70 ${closed ? 'bg-stone-100 dark:bg-stone-900/40' : 'cursor-pointer hover:bg-amber-50 dark:hover:bg-stone-700'}`}
                   onClick={closed ? undefined : () => onCreateSlot(slotDate(d, min))}
                   onDragOver={closed ? undefined : (e) => e.preventDefault()}
                   onDrop={
@@ -120,7 +120,7 @@ export function WeekDayGrid({
                 const rowIndex = Math.floor((sMin - startMin) / 60)
                 if (rowIndex < 0 || rowIndex >= hourCount) return null
                 const span = Math.min(Math.max(1, Math.ceil(durationMin(a) / 60)), hourCount - rowIndex)
-                const color = a.barber?.color ?? '#78716c'
+                const color = a.is_block ? '#57534e' : a.barber?.color ?? '#78716c'
                 const cancelled = a.status === 'cancelled'
                 return (
                   <button
@@ -134,14 +134,16 @@ export function WeekDayGrid({
                     style={{ gridColumn: c + 2, gridRow: `${rowIndex + 1} / span ${span}`, backgroundColor: color }}
                     className={`z-10 m-0.5 overflow-hidden rounded-md px-2 py-1 text-left text-xs text-white shadow-sm ${
                       cancelled ? 'opacity-50 line-through' : ''
-                    }`}
+                    } ${a.is_block ? 'opacity-80' : ''}`}
                   >
                     <div className="font-medium">
-                      {hm(start)} {a.service?.name ?? ''}
+                      {hm(start)} {a.is_block ? '⛔ Bloqué' : a.service?.name ?? ''}
                     </div>
-                    <div className="truncate opacity-90">
-                      {a.client ? `${a.client.first_name} ${a.client.last_name ?? ''}`.trim() : 'Sans client'}
-                    </div>
+                    {!a.is_block && (
+                      <div className="truncate opacity-90">
+                        {a.client ? `${a.client.first_name} ${a.client.last_name ?? ''}`.trim() : 'Sans client'}
+                      </div>
+                    )}
                   </button>
                 )
               }),

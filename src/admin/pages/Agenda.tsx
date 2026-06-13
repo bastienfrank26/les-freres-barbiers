@@ -95,10 +95,12 @@ export function Agenda() {
     }
   }, [startISO, endISO, refreshKey])
 
-  const visibleAppointments = useMemo(
-    () => (barberFilter === 'all' ? appointments : appointments.filter((a) => a.barber_id === barberFilter)),
-    [appointments, barberFilter],
-  )
+  // Barbiers actifs uniquement (les RDV des barbiers désactivés ne s'affichent pas).
+  const activeBarberIds = useMemo(() => new Set(barbers.map((b) => b.id)), [barbers])
+  const visibleAppointments = useMemo(() => {
+    const base = appointments.filter((a) => activeBarberIds.has(a.barber_id))
+    return barberFilter === 'all' ? base : base.filter((a) => a.barber_id === barberFilter)
+  }, [appointments, activeBarberIds, barberFilter])
 
   const { startMin, endMin } = useMemo(() => gridRange(hours), [hours])
 
@@ -140,7 +142,7 @@ export function Agenda() {
   const viewBtn = (v: View, label: string) => (
     <button
       onClick={() => setView(v)}
-      className={`rounded-lg px-3 py-1.5 text-sm transition ${view === v ? 'bg-amber-800 text-white' : 'text-stone-600 hover:bg-stone-100'}`}
+      className={`rounded-lg px-3 py-1.5 text-sm transition ${view === v ? 'bg-amber-800 text-white' : 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700'}`}
     >
       {label}
     </button>
@@ -150,14 +152,14 @@ export function Agenda() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-800">Agenda</h1>
-          <p className="mt-1 text-sm capitalize text-stone-500">{title}</p>
+          <h1 className="text-2xl font-semibold text-stone-800 dark:text-stone-100">Agenda</h1>
+          <p className="mt-1 text-sm capitalize text-stone-500 dark:text-stone-400">{title}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <select
             value={barberFilter}
             onChange={(e) => setBarberFilter(e.target.value)}
-            className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm outline-none focus:border-amber-700"
+            className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm outline-none focus:border-amber-700 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100"
           >
             <option value="all">Tous les barbiers</option>
             {barbers.map((b) => (
@@ -166,19 +168,19 @@ export function Agenda() {
               </option>
             ))}
           </select>
-          <div className="flex items-center rounded-lg border border-stone-200 bg-white p-0.5">
+          <div className="flex items-center rounded-lg border border-stone-200 bg-white p-0.5 dark:border-stone-700 dark:bg-stone-800">
             {viewBtn('day', 'Jour')}
             {viewBtn('week', 'Semaine')}
             {viewBtn('month', 'Mois')}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => shift(-1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100" aria-label="Précédent">
+            <button onClick={() => shift(-1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700" aria-label="Précédent">
               ‹
             </button>
-            <button onClick={() => setCursor(new Date())} className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100">
+            <button onClick={() => setCursor(new Date())} className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700">
               Aujourd’hui
             </button>
-            <button onClick={() => shift(1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100" aria-label="Suivant">
+            <button onClick={() => shift(1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700" aria-label="Suivant">
               ›
             </button>
           </div>

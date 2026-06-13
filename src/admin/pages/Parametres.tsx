@@ -12,6 +12,8 @@ import type { Barber } from '../../lib/barbers'
 import { getSettings, setSetting } from '../../lib/settings'
 import type { BookingMode, Settings } from '../../lib/settings'
 import { DAY_LABELS } from '../../lib/datetime'
+import { getTheme, setTheme } from '../../lib/theme'
+import type { Theme } from '../../lib/theme'
 
 type HourRow = { id: string; weekday: number; open: string; close: string; closed: boolean }
 
@@ -28,6 +30,12 @@ export function Parametres() {
   const [savedHours, setSavedHours] = useState(false)
 
   const [newClosure, setNewClosure] = useState({ date: '', reason: '', barber_id: '' })
+  const [theme, setThemeState] = useState<Theme>(() => getTheme())
+
+  function changeTheme(t: Theme) {
+    setThemeState(t)
+    setTheme(t)
+  }
 
   useEffect(() => {
     let active = true
@@ -106,14 +114,32 @@ export function Parametres() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold text-stone-800">Paramètres</h1>
-      <p className="mt-1 text-sm text-stone-500">Heures d’ouverture, congés, réservation en ligne et notifications.</p>
+      <h1 className="text-2xl font-semibold text-stone-800 dark:text-stone-100">Paramètres</h1>
+      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">Apparence, heures d’ouverture, congés, réservation en ligne et notifications.</p>
 
       {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
+      {/* Apparence (mode sombre / clair) */}
+      <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-700 dark:bg-stone-800">
+        <h2 className="text-lg font-medium text-stone-800 dark:text-stone-100">Apparence</h2>
+        <div className="mt-3 inline-flex rounded-lg border border-stone-200 p-0.5 dark:border-stone-600">
+          {(['light', 'dark'] as Theme[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => changeTheme(t)}
+              className={`rounded-md px-4 py-1.5 text-sm transition ${
+                theme === t ? 'bg-amber-800 text-white' : 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700'
+              }`}
+            >
+              {t === 'light' ? '☀ Clair' : '🌙 Sombre'}
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Heures d'ouverture */}
-      <section className="mt-8 rounded-2xl border border-stone-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-stone-800">Heures d’ouverture</h2>
+      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-700 dark:bg-stone-800">
+        <h2 className="text-lg font-medium text-stone-800 dark:text-stone-100">Heures d’ouverture</h2>
         <div className="mt-4 space-y-2">
           {sortedHours.map((r) => (
             <div key={r.id} className="flex items-center gap-3">
@@ -150,8 +176,8 @@ export function Parametres() {
       </section>
 
       {/* Congés */}
-      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6">
-        <h2 className="text-lg font-medium text-stone-800">Congés et fermetures</h2>
+      <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-700 dark:bg-stone-800">
+        <h2 className="text-lg font-medium text-stone-800 dark:text-stone-100">Congés et fermetures</h2>
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <div>
             <label className="block text-xs text-stone-500">Date</label>
@@ -210,8 +236,8 @@ export function Parametres() {
 
       {/* Réservation en ligne + notifications */}
       {settings && (
-        <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6">
-          <h2 className="text-lg font-medium text-stone-800">Réservation en ligne</h2>
+        <section className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-700 dark:bg-stone-800">
+          <h2 className="text-lg font-medium text-stone-800 dark:text-stone-100">Réservation en ligne</h2>
           <div className="mt-3 space-y-2">
             {(['request', 'auto'] as BookingMode[]).map((mode) => (
               <label key={mode} className="flex items-start gap-2 text-sm text-stone-700">
@@ -234,23 +260,33 @@ export function Parametres() {
             ))}
           </div>
 
-          <h2 className="mt-6 text-lg font-medium text-stone-800">Notifications</h2>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-medium text-stone-800 dark:text-stone-100">Notifications</h2>
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+              Option disponible
+            </span>
+          </div>
+          <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+            📱 Les notifications <strong>par SMS</strong> nécessitent un <strong>abonnement mensuel</strong> auprès d’un
+            fournisseur SMS. En revanche, la <strong>confirmation par courriel</strong> peut être offerte
+            <strong> gratuitement via Resend</strong> (jusqu’à 3 000 courriels par mois).
+          </p>
           <div className="mt-3 space-y-2">
-            <label className="flex items-center gap-2 text-sm text-stone-700">
+            <label className="flex items-center gap-2 text-sm text-stone-700 dark:text-stone-300">
               <input
                 type="checkbox"
                 checked={settings.notify_email_enabled}
                 onChange={(e) => changeSetting('notify_email_enabled', e.target.checked, String(e.target.checked))}
               />
-              Notifications par courriel
+              Notifications par courriel (Resend — gratuit)
             </label>
-            <label className="flex items-center gap-2 text-sm text-stone-700">
+            <label className="flex items-center gap-2 text-sm text-stone-700 dark:text-stone-300">
               <input
                 type="checkbox"
                 checked={settings.notify_sms_enabled}
                 onChange={(e) => changeSetting('notify_sms_enabled', e.target.checked, String(e.target.checked))}
               />
-              Notifications par SMS
+              Notifications par SMS (abonnement requis)
             </label>
             <p className="text-xs text-stone-400">L’envoi effectif (fournisseur courriel / SMS) sera branché ultérieurement.</p>
           </div>
