@@ -22,10 +22,28 @@ export async function listBusinessHours(): Promise<BusinessHour[]> {
   return data ?? []
 }
 
+export async function updateBusinessHour(
+  id: string,
+  input: { open_time: string | null; close_time: string | null; is_closed: boolean },
+): Promise<void> {
+  const { error } = await supabase.from('business_hours').update(input).eq('id', id)
+  if (error) throw error
+}
+
 export async function listClosures(): Promise<Closure[]> {
   const { data, error } = await supabase.from('closures').select('*').order('date')
   if (error) throw error
   return data ?? []
+}
+
+export async function createClosure(input: { date: string; reason: string | null; barber_id: string | null }): Promise<void> {
+  const { error } = await supabase.from('closures').insert(input)
+  if (error) throw error
+}
+
+export async function deleteClosure(id: string): Promise<void> {
+  const { error } = await supabase.from('closures').delete().eq('id', id)
+  if (error) throw error
 }
 
 export type DayConfig = { closed: boolean; openMin: number; closeMin: number }

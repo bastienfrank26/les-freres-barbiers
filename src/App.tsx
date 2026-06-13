@@ -4,6 +4,9 @@ import logoBanner from './assets/logo-banner-t.png'
 import logoEmblem from './assets/logo-emblem-t.png'
 import { formatPrice, listActiveServices } from './lib/services'
 import type { Service } from './lib/services'
+import { listActiveBarbers } from './lib/barbers'
+import type { Barber } from './lib/barbers'
+import { bookAppointment, getAvailableSlots } from './lib/booking'
 
 /* ---------- data ---------- */
 type Why = { n: string; t: string; d: string }
@@ -49,9 +52,6 @@ const navLinks = [
   ['#contact', 'Contact'],
 ] as const
 
-const serviceChips = ['Coupe classique', 'Coupe stylée', 'Taille de barbe', 'Rasage à la lame', 'Combo cheveux + barbe']
-const timeChips = ['10:00', '11:30', '13:00', '15:30', '18:00']
-
 const todayIdx = (new Date().getDay() + 6) % 7 // Mon = 0
 
 function App() {
@@ -60,16 +60,42 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalDone, setModalDone] = useState(false)
   const [svcSel, setSvcSel] = useState(0)
-  const [timeSel, setTimeSel] = useState(2)
+  const [barberSel, setBarberSel] = useState(0)
   const [date, setDate] = useState('')
+  const [slots, setSlots] = useState<string[]>([])
+  const [slotSel, setSlotSel] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [booking, setBooking] = useState(false)
+  const [bookError, setBookError] = useState<string | null>(null)
+  const [bookConfirmed, setBookConfirmed] = useState(false)
   const [services, setServices] = useState<Service[]>([])
+  const [barbers, setBarbers] = useState<Barber[]>([])
 
-  /* services depuis Supabase */
+  /* services + barbiers depuis Supabase */
   useEffect(() => {
     listActiveServices()
       .then(setServices)
       .catch((e) => console.error('Chargement des services échoué', e))
+    listActiveBarbers()
+      .then(setBarbers)
+      .catch((e) => console.error('Chargement des barbiers échoué', e))
   }, [])
+
+  /* créneaux disponibles (réservation en ligne) */
+  useEffect(() => {
+    const svc = services[svcSel]
+    const barber = barbers[barberSel]
+    let active = true
+    if (modalOpen && svc && barber && date) {
+      getAvailableSlots(svc.id, barber.id, date)
+        .then((s) => active && setSlots(s))
+        .catch(() => active && setSlots([]))
+    }
+    return () => {
+      active = false
+    }
+  }, [modalOpen, services, barbers, svcSel, barberSel, date])
 
   /* cartes de tarifs dérivées : regroupées par catégorie */
   const prices = useMemo<PriceCard[]>(() => {
@@ -128,6 +154,9 @@ function App() {
 
   function openModal() {
     setModalDone(false)
+    setBookError(null)
+    setBookConfirmed(false)
+    setSlotSel('')
     setModalOpen(true)
     setDrawerOpen(false)
     if (!date) {
@@ -136,6 +165,33 @@ function App() {
   }
   function closeModal() {
     setModalOpen(false)
+  }
+
+  async function submitBooking() {
+    const svc = services[svcSel]
+    const barber = barbers[barberSel]
+    if (!svc || !barber || !date || !slotSel || !fullName.trim()) {
+      setBookError('Choisissez un service, un barbier, une date, une heure et indiquez votre nom.')
+      return
+    }
+    setBooking(true)
+    setBookError(null)
+    try {
+      const start = new Date(`${date}T${slotSel}:00`)
+      const res = await bookAppointment({
+        serviceId: svc.id,
+        barberId: barber.id,
+        startsAt: start.toISOString(),
+        firstName: fullName.trim(),
+        phone,
+      })
+      setBookConfirmed(res.status === 'confirmed')
+      setModalDone(true)
+    } catch (e) {
+      setBookError(e instanceof Error ? e.message : 'La réservation a échoué. Réessayez.')
+    } finally {
+      setBooking(false)
+    }
   }
 
   const todayHours = hours[todayIdx][2] ? hours[todayIdx][1].replace(/\s/g, '') : 'Fermé'
@@ -558,39 +614,82 @@ function App() {
               <div className="field">
                 <label>Service souhaité</label>
                 <div className="chips">
-                  {serviceChips.map((c, i) => (
-                    <span className={`chip${svcSel === i ? ' on' : ''}`} key={c} onClick={() => setSvcSel(i)}>
-                      {c}
+                  {services.map((s, i) => (
+                    <span
+                      className={`chip${svcSel === i ? ' on' : ''}`}
+                      key={s.id}
+                      onClick={() => {
+                        setSvcSel(i)
+                        setSlotSel('')
+                      }}
+                    >
+                      {s.name}
                     </span>
                   ))}
                 </div>
               </div>
+              {barbers.length > 1 && (
+                <div className="field">
+                  <label>Barbier</label>
+                  <div className="chips">
+                    {barbers.map((b, i) => (
+                      <span
+                        className={`chip${barberSel === i ? ' on' : ''}`}
+                        key={b.id}
+                        onClick={() => {
+                          setBarberSel(i)
+                          setSlotSel('')
+                        }}
+                      >
+                        {b.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="row2">
                 <div className="field">
                   <label>Date</label>
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => {
+                      setDate(e.target.value)
+                      setSlotSel('')
+                    }}
+                  />
                 </div>
                 <div className="field">
                   <label>Nom complet</label>
-                  <input type="text" placeholder="Votre nom" />
+                  <input type="text" placeholder="Votre nom" value={fullName} onChange={(e) => setFullName(e.target.value)} />
                 </div>
               </div>
               <div className="field">
                 <label>Heure</label>
                 <div className="chips">
-                  {timeChips.map((c, i) => (
-                    <span className={`chip${timeSel === i ? ' on' : ''}`} key={c} onClick={() => setTimeSel(i)}>
-                      {c}
-                    </span>
-                  ))}
+                  {slots.length === 0 ? (
+                    <span className="msmall">Aucun créneau disponible pour cette date.</span>
+                  ) : (
+                    slots.map((t) => (
+                      <span className={`chip${slotSel === t ? ' on' : ''}`} key={t} onClick={() => setSlotSel(t)}>
+                        {t}
+                      </span>
+                    ))
+                  )}
                 </div>
               </div>
               <div className="field">
                 <label>Téléphone</label>
-                <input type="tel" placeholder="+1 ( ___ ) ___ - ____" />
+                <input
+                  type="tel"
+                  placeholder="+1 ( ___ ) ___ - ____"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
               </div>
-              <button className="btn btn-primary" onClick={() => setModalDone(true)}>
-                <span className="ic">✓</span> Confirmer la demande
+              {bookError && <div className="msmall" style={{ color: 'var(--pole-red)' }}>{bookError}</div>}
+              <button className="btn btn-primary" onClick={submitBooking} disabled={booking}>
+                <span className="ic">✓</span> {booking ? 'Envoi…' : 'Confirmer la demande'}
               </button>
               <div className="msmall">Réponse rapide par téléphone · Sans rendez-vous accepté en tout temps</div>
             </div>
@@ -598,10 +697,11 @@ function App() {
           {modalDone && (
             <div className="mdone" style={{ display: 'block' }}>
               <div className="check">✓</div>
-              <h3>Demande envoyée</h3>
+              <h3>{bookConfirmed ? 'Rendez-vous confirmé' : 'Demande envoyée'}</h3>
               <p>
-                Merci ! Nous vous confirmerons votre rendez-vous par téléphone dans les plus brefs délais. À très bientôt
-                au salon.
+                {bookConfirmed
+                  ? 'Votre rendez-vous est confirmé. À très bientôt au salon !'
+                  : 'Merci ! Nous vous confirmerons votre rendez-vous dans les plus brefs délais. À très bientôt au salon.'}
               </p>
               <button className="btn btn-ghost" onClick={closeModal} style={{ marginTop: 22 }}>
                 Fermer
