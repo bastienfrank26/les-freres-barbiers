@@ -11,9 +11,28 @@ export type Barber = {
   role: BarberRole
   user_id: string | null
   email: string | null
+  must_change_password: boolean
 }
 
-export type BarberInput = { name: string; color: string; is_active: boolean }
+export type BarberInput = { name: string; is_active: boolean }
+
+const EMAIL_DOMAIN = 'les-freres-barbiers.com'
+
+/** Normalise un segment de nom pour l'adresse courriel (sans accents/espaces). */
+function slug(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+/** Construit l'adresse prenom.nom@les-freres-barbiers.com. */
+export function barberEmail(firstName: string, lastName: string): string {
+  return `${slug(firstName)}.${slug(lastName)}@${EMAIL_DOMAIN}`
+}
 
 export async function listBarbers(): Promise<Barber[]> {
   const { data, error } = await supabase.from('barbers').select('*').order('name')
@@ -27,9 +46,28 @@ export async function listActiveBarbers(): Promise<Barber[]> {
   return data ?? []
 }
 
-export async function createBarber(input: BarberInput): Promise<void> {
-  const { error } = await supabase.from('barbers').insert(input)
+/**
+ * (Admin) Crée un barbier AVEC son compte de connexion.
+ * Le courriel est dérivé du prénom et du nom ; le mot de passe est le mot de
+ * passe temporaire « Barbier123 » à changer à la première connexion.
+ * Retourne l'adresse courriel générée.
+ */
+export async function createBarberWithAccount(
+  firstName: string,
+  lastName: string,
+  tempPassword: string,
+  role: BarberRole = 'barber',
+): Promise<string> {
+  const email = barberEmail(firstName, lastName)
+  const name = `${firstName.trim()} ${lastName.trim()}`.trim()
+  const { error } = await supabase.rpc('admin_create_barber', {
+    p_name: name,
+    p_email: email,
+    p_password: tempPassword,
+    p_role: role,
+  })
   if (error) throw error
+  return email
 }
 
 export async function updateBarber(id: string, input: Partial<BarberInput>): Promise<void> {
@@ -87,5 +125,11 @@ export async function setBarberRole(barberId: string, role: BarberRole): Promise
 /** Change son propre mot de passe (utilisateur connecté). */
 export async function changeMyPassword(password: string): Promise<void> {
   const { error } = await supabase.auth.updateUser({ password })
+  if (error) throw error
+}
+
+/** Efface le drapeau « doit changer son mot de passe » de l'utilisateur connecté. */
+export async function clearMyPasswordChangeFlag(): Promise<void> {
+  const { error } = await supabase.rpc('clear_my_password_change_flag')
   if (error) throw error
 }

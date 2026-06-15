@@ -5,7 +5,7 @@ export function ProtectedRoute() {
   const { session, loading } = useAuth()
 
   if (loading) {
-    return <div className="grid min-h-screen place-items-center text-stone-500">Chargement…</div>
+    return <div className="grid min-h-screen place-items-center text-muted">Chargement…</div>
   }
   if (!session) {
     return <Navigate to="/admin/login" replace />

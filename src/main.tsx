@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { applyTheme, getTheme } from './lib/theme'
 import { AuthProvider } from './auth/AuthProvider'
 import { ProtectedRoute } from './auth/ProtectedRoute'
+import { RequireAdmin } from './auth/RequireAdmin'
 import { Login } from './admin/Login'
 import { AdminLayout } from './admin/AdminLayout'
 import { Agenda } from './admin/pages/Agenda'
@@ -31,9 +32,12 @@ createRoot(document.getElementById('root')!).render(
               <Route index element={<Navigate to="/admin/agenda" replace />} />
               <Route path="agenda" element={<Agenda />} />
               <Route path="clients" element={<Clients />} />
-              <Route path="services" element={<Services />} />
-              <Route path="barbiers" element={<Barbiers />} />
               <Route path="parametres" element={<Parametres />} />
+              {/* Modules réservés aux administrateurs */}
+              <Route element={<RequireAdmin />}>
+                <Route path="services" element={<Services />} />
+                <Route path="barbiers" element={<Barbiers />} />
+              </Route>
             </Route>
           </Route>
         </Routes>

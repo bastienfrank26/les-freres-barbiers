@@ -47,7 +47,7 @@ function toInput(d: Draft): ServiceInput {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100'
+  'mt-1 w-full ui-input'
 
 function ServiceForm({
   initial,
@@ -85,25 +85,25 @@ function ServiceForm({
       <form
         onSubmit={onSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-stone-800"
+        className="w-full max-w-lg ui-card p-6 shadow-xl"
       >
-        <h2 className="text-lg font-semibold text-stone-800 dark:text-stone-100">
+        <h2 className="text-lg font-semibold text-fg">
           {initial ? 'Modifier le service' : 'Nouveau service'}
         </h2>
 
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Catégorie</label>
+            <label className="block text-sm font-medium text-fg">Catégorie</label>
             <input className={inputClass} value={draft.category} onChange={(e) => set('category', e.target.value)} required />
           </div>
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Nom</label>
+            <label className="block text-sm font-medium text-fg">Nom</label>
             <input className={inputClass} value={draft.name} onChange={(e) => set('name', e.target.value)} required />
           </div>
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Description</label>
+          <label className="block text-sm font-medium text-fg">Description</label>
           <textarea
             className={inputClass}
             rows={2}
@@ -114,31 +114,31 @@ function ServiceForm({
 
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Prix ($)</label>
+            <label className="block text-sm font-medium text-fg">Prix ($)</label>
             <input className={inputClass} value={draft.price} onChange={(e) => set('price', e.target.value)} inputMode="decimal" required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Durée (min)</label>
+            <label className="block text-sm font-medium text-fg">Durée (min)</label>
             <input className={inputClass} type="number" min={0} value={draft.duration_min} onChange={(e) => set('duration_min', e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Ordre</label>
+            <label className="block text-sm font-medium text-fg">Ordre</label>
             <input className={inputClass} type="number" value={draft.display_order} onChange={(e) => set('display_order', e.target.value)} />
           </div>
         </div>
 
-        <label className="mt-4 flex items-center gap-2 text-sm text-stone-700">
+        <label className="mt-4 flex items-center gap-2 text-sm text-fg">
           <input type="checkbox" checked={draft.is_active} onChange={(e) => set('is_active', e.target.checked)} />
           Actif (affiché sur le site et réservable)
         </label>
 
-        {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mt-4 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}
 
         <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2 text-sm text-stone-600 hover:bg-stone-100">
+          <button type="button" onClick={onCancel} className="ui-btn-ghost">
             Annuler
           </button>
-          <button type="submit" disabled={busy} className="rounded-lg bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900 disabled:opacity-60">
+          <button type="submit" disabled={busy} className="ui-btn-primary">
             {busy ? 'Enregistrement…' : 'Enregistrer'}
           </button>
         </div>
@@ -209,24 +209,24 @@ export function Services() {
     <div>
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-800 dark:text-stone-100">Services</h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+          <h1 className="text-2xl font-semibold text-fg">Services</h1>
+          <p className="mt-1 text-sm text-muted">
             {count} service{count > 1 ? 's' : ''} actif{count > 1 ? 's' : ''} · catalogue des prestations réservables.
           </p>
         </div>
         <button
           onClick={() => setEditing('new')}
-          className="rounded-lg bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900"
+          className="ui-btn-primary"
         >
           + Ajouter
         </button>
       </div>
 
-      {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-4 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-800">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-stone-50 text-left text-xs uppercase tracking-wide text-stone-500 dark:bg-stone-900 dark:text-stone-400">
+          <thead className="bg-bg-subtle text-left text-xs uppercase tracking-wide text-muted">
             <tr>
               <th className="px-4 py-3 font-medium">Catégorie</th>
               <th className="px-4 py-3 font-medium">Nom</th>
@@ -236,41 +236,45 @@ export function Services() {
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100 dark:divide-stone-700">
+          <tbody className="divide-y divide-border">
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-stone-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted">
                   Chargement…
                 </td>
               </tr>
             ) : services.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-stone-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted">
                   Aucun service.
                 </td>
               </tr>
             ) : (
               services.map((s) => (
                 <tr key={s.id} className={s.is_active ? '' : 'opacity-50'}>
-                  <td className="px-4 py-3 text-stone-500 dark:text-stone-400">{s.category}</td>
-                  <td className="px-4 py-3 font-medium text-stone-800 dark:text-stone-100">{s.name}</td>
+                  <td className="px-4 py-3 text-muted">{s.category}</td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => setEditing(s)} className="font-medium text-fg hover:text-accent hover:underline">
+                      {s.name}
+                    </button>
+                  </td>
                   <td className="px-4 py-3">{formatPrice(s.price_cents)}</td>
-                  <td className="px-4 py-3 text-stone-500 dark:text-stone-400">{s.duration_min} min</td>
+                  <td className="px-4 py-3 text-muted">{s.duration_min} min</td>
                   <td className="px-4 py-3">
                     <button
                       onClick={() => onToggleActive(s)}
                       className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        s.is_active ? 'bg-green-100 text-green-700' : 'bg-stone-200 text-stone-500'
+                        s.is_active ? 'bg-success-soft text-success' : 'bg-bg-subtle text-muted'
                       }`}
                     >
                       {s.is_active ? 'Actif' : 'Inactif'}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button onClick={() => setEditing(s)} className="text-amber-800 hover:underline">
+                    <button onClick={() => setEditing(s)} className="text-accent hover:underline">
                       Modifier
                     </button>
-                    <button onClick={() => onDelete(s)} className="ml-4 text-red-600 hover:underline">
+                    <button onClick={() => onDelete(s)} className="ml-4 text-danger hover:underline">
                       Supprimer
                     </button>
                   </td>

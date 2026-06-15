@@ -3,6 +3,134 @@
 /* Mode sombre piloté par la classe .dark (sur <html>) — utilisé par la console /admin */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* =====================================================================
+   SYSTÈME DE THÈME « Signa » (console /admin)
+   Identité visuelle Signa : accent ORANGE, mode sombre quasi-noir,
+   mode clair crème chaud. Tokens en variables CSS, swap clair/sombre via
+   .dark, exposés à Tailwind via @theme inline (utilitaires bg-*, text-*,
+   border-* sémantiques). Distinct du branding du client (logo, pastilles).
+   ===================================================================== */
+:root{
+  --bg:#F4F2EC;            /* fond principal — crème chaud */
+  --bg-subtle:#ECEAE2;     /* fond secondaire / survol / item actif */
+  --card:#FFFFFF;          /* cartes */
+  --sidebar:#FFFFFF;       /* sidebar */
+  --border:#E7E3D9;        /* bordures subtiles (chaudes) */
+  --border-strong:#D8D3C7; /* bordures de champs */
+  --fg:#1A1A1A;            /* texte principal — quasi-noir */
+  --muted:#8A867C;         /* texte secondaire — gris chaud */
+  --accent:#F97316;        /* accent Signa — orange */
+  --accent-hover:#EA580C;
+  --accent-fg:#FFFFFF;
+  --accent-soft:rgba(249,115,22,.10);  /* fonds actifs/survol orangés */
+  --ring:rgba(249,115,22,.28);         /* anneau de focus */
+  --success:#16A34A;
+  --success-soft:rgba(22,163,74,.12);
+  --warning:#D97706;
+  --warning-soft:rgba(217,119,6,.14);
+  --danger:#DC2626;
+  --danger-soft:rgba(220,38,38,.10);
+}
+.dark{
+  --bg:#0D0E12;            /* fond principal — quasi-noir */
+  --bg-subtle:#1A1C22;     /* fond secondaire / survol / item actif */
+  --card:#16181D;          /* cartes — légèrement surélevées */
+  --sidebar:#0D0E12;       /* sidebar — même fond, séparée par une bordure */
+  --border:#23252C;        /* bordures subtiles */
+  --border-strong:#2E313A; /* bordures de champs */
+  --fg:#F4F5F7;            /* texte principal */
+  --muted:#8A8F99;         /* texte secondaire */
+  --accent:#F97316;        /* accent Signa — orange */
+  --accent-hover:#FB8B3C;
+  --accent-fg:#FFFFFF;
+  --accent-soft:rgba(249,115,22,.14);
+  --ring:rgba(249,115,22,.40);
+  --success:#22C55E;
+  --success-soft:rgba(34,197,94,.16);
+  --warning:#F59E0B;
+  --warning-soft:rgba(245,158,11,.16);
+  --danger:#EF4444;
+  --danger-soft:rgba(239,68,68,.16);
+}
+
+@theme inline{
+  --color-bg:var(--bg);
+  --color-bg-subtle:var(--bg-subtle);
+  --color-card:var(--card);
+  --color-sidebar:var(--sidebar);
+  --color-border:var(--border);
+  --color-border-strong:var(--border-strong);
+  --color-fg:var(--fg);
+  --color-muted:var(--muted);
+  --color-accent:var(--accent);
+  --color-accent-hover:var(--accent-hover);
+  --color-accent-fg:var(--accent-fg);
+  --color-accent-soft:var(--accent-soft);
+  --color-success:var(--success);
+  --color-success-soft:var(--success-soft);
+  --color-warning:var(--warning);
+  --color-warning-soft:var(--warning-soft);
+  --color-danger:var(--danger);
+  --color-danger-soft:var(--danger-soft);
+}
+
+/* ---------- Composants UI réutilisables (console /admin) ---------- */
+@layer components{
+  /* Champs (inputs, selects, textarea) façon Stripe/Linear.
+     N'impose ni largeur ni marge : les utilitaires (w-full, mt-1, px-2…)
+     restent prioritaires et peuvent ajuster la mise en page. */
+  .ui-input{
+    border-radius:.5rem;
+    border:1px solid var(--border-strong);
+    background:var(--card);
+    color:var(--fg);
+    padding:.5rem .75rem;
+    font-size:.875rem;
+    line-height:1.25rem;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .ui-input::placeholder{color:var(--muted)}
+  .ui-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .ui-input:disabled{background:var(--bg-subtle);color:var(--muted);cursor:not-allowed}
+
+  /* Carte : surface qui ressort du fond, bordure subtile, ombre légère. */
+  .ui-card{
+    border-radius:1rem;
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.06);
+  }
+  .dark .ui-card{box-shadow:0 1px 2px rgba(0,0,0,.3)}
+
+  /* Boutons */
+  .ui-btn-primary{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    border-radius:.5rem;padding:.5rem 1rem;font-size:.875rem;font-weight:500;
+    background:var(--accent);color:var(--accent-fg);border:1px solid transparent;
+    cursor:pointer;transition:background .15s ease;
+  }
+  .ui-btn-primary:hover{background:var(--accent-hover)}
+  .ui-btn-primary:disabled{opacity:.6;cursor:not-allowed}
+
+  .ui-btn-secondary{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    border-radius:.5rem;padding:.5rem 1rem;font-size:.875rem;font-weight:500;
+    background:var(--card);color:var(--fg);border:1px solid var(--border-strong);
+    cursor:pointer;transition:background .15s ease,border-color .15s ease;
+  }
+  .ui-btn-secondary:hover{background:var(--bg-subtle)}
+  .ui-btn-secondary:disabled{opacity:.6;cursor:not-allowed}
+
+  .ui-btn-ghost{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    border-radius:.5rem;padding:.5rem 1rem;font-size:.875rem;font-weight:500;
+    background:transparent;color:var(--muted);border:1px solid transparent;
+    cursor:pointer;transition:background .15s ease,color .15s ease;
+  }
+  .ui-btn-ghost:hover{background:var(--bg-subtle);color:var(--fg)}
+  .ui-btn-ghost:disabled{opacity:.6;cursor:not-allowed}
+}
+
 :root{
   --ink:#211710;          /* near-black espresso */
   --brown:#33220f;        /* deep wood */

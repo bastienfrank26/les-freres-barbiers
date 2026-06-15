@@ -57,17 +57,17 @@ export function WeekDayGrid({
   }
 
   return (
-    <div className="overflow-auto rounded-2xl border border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-800">
+    <div className="overflow-auto rounded-2xl border border-border bg-card">
       <div className="min-w-[680px]">
         {/* En-têtes de jours */}
-        <div className="grid border-b border-stone-200 dark:border-stone-700" style={{ gridTemplateColumns: cols }}>
+        <div className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
           <div />
           {days.map((d) => {
             const today = sameDay(d, new Date())
             return (
-              <div key={d.toISOString()} className={`px-2 py-2 text-center text-sm ${today ? 'text-amber-800 dark:text-amber-500' : 'text-stone-600 dark:text-stone-300'}`}>
+              <div key={d.toISOString()} className={`px-2 py-2 text-center text-sm ${today ? 'text-accent' : 'text-muted'}`}>
                 <div className="font-medium">{DAY_LABELS_SHORT[weekdayIndex(d)]}</div>
-                <div className={`text-xs ${today ? 'font-semibold' : 'text-stone-400'}`}>{d.getDate()}</div>
+                <div className={`text-xs ${today ? 'font-semibold' : 'text-muted'}`}>{d.getDate()}</div>
               </div>
             )
           })}
@@ -79,7 +79,7 @@ export function WeekDayGrid({
           {rows.map((min, r) => (
             <div
               key={`t-${min}`}
-              className="border-r border-stone-200 pr-2 pt-1 text-right text-xs text-stone-400 dark:border-stone-700"
+              className="border-r border-border pr-2 pt-1 text-right text-xs text-muted"
               style={{ gridColumn: 1, gridRow: r + 1 }}
             >
               {minutesToTime(min)}
@@ -94,7 +94,7 @@ export function WeekDayGrid({
                 <div
                   key={`c-${c}-${min}`}
                   style={{ gridColumn: c + 2, gridRow: r + 1 }}
-                  className={`border-b border-r border-stone-100 dark:border-stone-700/70 ${closed ? 'bg-stone-100 dark:bg-stone-900/40' : 'cursor-pointer hover:bg-amber-50 dark:hover:bg-stone-700'}`}
+                  className={`border-b border-r border-border ${closed ? 'bg-bg-subtle' : 'cursor-pointer hover:bg-accent-soft'}`}
                   onClick={closed ? undefined : () => onCreateSlot(slotDate(d, min))}
                   onDragOver={closed ? undefined : (e) => e.preventDefault()}
                   onDrop={

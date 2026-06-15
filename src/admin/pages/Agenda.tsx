@@ -164,7 +164,7 @@ export function Agenda() {
   const viewBtn = (v: View, label: string) => (
     <button
       onClick={() => setView(v)}
-      className={`rounded-lg px-3 py-1.5 text-sm transition ${view === v ? 'bg-amber-800 text-white' : 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700'}`}
+      className={`rounded-lg px-3 py-1.5 text-sm transition ${view === v ? 'bg-accent text-accent-fg' : 'text-muted hover:bg-bg-subtle'}`}
     >
       {label}
     </button>
@@ -174,15 +174,15 @@ export function Agenda() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-stone-800 dark:text-stone-100">Agenda</h1>
-          <p className="mt-1 text-sm capitalize text-stone-500 dark:text-stone-400">{title}</p>
+          <h1 className="text-2xl font-semibold text-fg">Agenda</h1>
+          <p className="mt-1 text-sm capitalize text-muted">{title}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {isAdmin && (
             <select
               value={barberFilter}
               onChange={(e) => setBarberFilter(e.target.value)}
-              className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm outline-none focus:border-amber-700 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100"
+              className="ui-input px-3 py-1.5"
             >
               <option value="all">Tous les barbiers</option>
               {barbers.map((b) => (
@@ -192,19 +192,19 @@ export function Agenda() {
               ))}
             </select>
           )}
-          <div className="flex items-center rounded-lg border border-stone-200 bg-white p-0.5 dark:border-stone-700 dark:bg-stone-800">
+          <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
             {viewBtn('day', 'Jour')}
             {viewBtn('week', 'Semaine')}
             {viewBtn('month', 'Mois')}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => shift(-1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700" aria-label="Précédent">
+            <button onClick={() => shift(-1)} className="rounded-lg px-2 py-1.5 text-muted hover:bg-bg-subtle" aria-label="Précédent">
               ‹
             </button>
-            <button onClick={() => setCursor(new Date())} className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700">
+            <button onClick={() => setCursor(new Date())} className="rounded-lg px-3 py-1.5 text-sm text-muted hover:bg-bg-subtle">
               Aujourd’hui
             </button>
-            <button onClick={() => shift(1)} className="rounded-lg px-2 py-1.5 text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700" aria-label="Suivant">
+            <button onClick={() => shift(1)} className="rounded-lg px-2 py-1.5 text-muted hover:bg-bg-subtle" aria-label="Suivant">
               ›
             </button>
           </div>
@@ -212,9 +212,9 @@ export function Agenda() {
       </div>
 
       {error && (
-        <p className="mt-4 flex items-center justify-between rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-4 flex items-center justify-between rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
           {error}
-          <button onClick={() => setError(null)} className="ml-3 text-red-500 hover:text-red-700">
+          <button onClick={() => setError(null)} className="ml-3 text-danger hover:text-danger">
             ✕
           </button>
         </p>
@@ -248,8 +248,8 @@ export function Agenda() {
       </div>
 
       {/* Légende : code de couleurs selon l'état du rendez-vous */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-stone-500 dark:text-stone-400">
-        <span className="font-medium text-stone-600 dark:text-stone-300">États :</span>
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
+        <span className="font-medium text-muted">États :</span>
         {STATUS_ORDER.map((s) => (
           <span key={s} className="inline-flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: STATUS_COLORS[s].bg }} />

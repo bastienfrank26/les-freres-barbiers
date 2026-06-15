@@ -30,17 +30,17 @@ type Props = {
 }
 
 const inputClass =
-  'mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20 disabled:bg-stone-100 disabled:text-stone-500 dark:border-stone-600 dark:bg-stone-700 dark:text-stone-100 dark:disabled:bg-stone-800'
+  'mt-1 w-full ui-input'
 
 const NEW_CLIENT = '__new__'
 
 const STATUSES: AppointmentStatus[] = ['pending', 'confirmed', 'completed', 'no_show', 'paid', 'cancelled']
 
 const QUICK: { status: AppointmentStatus; label: string; cls: string }[] = [
-  { status: 'confirmed', label: 'Confirmé', cls: 'bg-green-100 text-green-700 hover:bg-green-200' },
-  { status: 'cancelled', label: 'Annulé', cls: 'bg-red-100 text-red-700 hover:bg-red-200' },
-  { status: 'no_show', label: 'Absent', cls: 'bg-stone-200 text-stone-600 hover:bg-stone-300' },
-  { status: 'paid', label: 'Payé', cls: 'bg-amber-100 text-amber-800 hover:bg-amber-200' },
+  { status: 'confirmed', label: 'Confirmé', cls: 'bg-success-soft text-success hover:opacity-80' },
+  { status: 'cancelled', label: 'Annulé', cls: 'bg-danger-soft text-danger hover:opacity-80' },
+  { status: 'no_show', label: 'Absent', cls: 'bg-bg-subtle text-muted hover:opacity-80' },
+  { status: 'paid', label: 'Payé', cls: 'bg-accent-soft text-accent hover:opacity-80' },
 ]
 
 export function AppointmentModal({ state, clients, services, ctx, canEdit = true, onCancel, onSaved }: Props) {
@@ -122,6 +122,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
           email: newClient.email.trim() || null,
           phone: newClient.phone.trim() || null,
           notes: null,
+          barber_id: barberId || null,
         })
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erreur lors de la création du client')
@@ -178,32 +179,32 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={onCancel}>
-      <form onSubmit={onSubmit} onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-stone-800">
+      <form onSubmit={onSubmit} onClick={(e) => e.stopPropagation()} className="max-h-[90vh] w-full max-w-lg overflow-y-auto ui-card p-6 shadow-xl">
         <div className="flex items-start justify-between">
-          <h2 className="text-lg font-semibold text-stone-800 dark:text-stone-100">
+          <h2 className="text-lg font-semibold text-fg">
             {editing ? (isBlock ? 'Plage bloquée' : 'Rendez-vous') : 'Nouveau rendez-vous'}
           </h2>
           <div className="flex items-center gap-3">
             {!editing && (
-              <label className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
+              <label className="flex items-center gap-2 text-sm text-muted">
                 <input type="checkbox" checked={isBlock} onChange={(e) => toggleBlock(e.target.checked)} />
                 Bloquer cette plage horaire
               </label>
             )}
-            <button type="button" onClick={onCancel} className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200" aria-label="Fermer">
+            <button type="button" onClick={onCancel} className="text-muted hover:text-fg" aria-label="Fermer">
               ✕
             </button>
           </div>
         </div>
 
         {readOnly && (
-          <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          <p className="mt-3 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
             Ce rendez-vous appartient à un autre barbier. Seul un administrateur peut le modifier.
           </p>
         )}
 
         {editing && !isBlock && (
-          <div className="mt-2 rounded-lg bg-stone-50 px-3 py-2 text-sm text-stone-600 dark:bg-stone-700 dark:text-stone-300">
+          <div className="mt-2 rounded-lg bg-bg-subtle px-3 py-2 text-sm text-muted">
             {service ? `${service.name} · ${duration} min · ${formatPrice(service.price_cents)}` : ''}
             {editing.client?.phone ? ` · ☎ ${editing.client.phone}` : ''}
           </div>
@@ -212,7 +213,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
         {!isBlock && (
           <>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Client</label>
+              <label className="block text-sm font-medium text-fg">Client</label>
               <select className={inputClass} value={clientId} onChange={(e) => setClientId(e.target.value)} disabled={readOnly}>
                 <option value="">— Sans fiche client —</option>
                 <option value={NEW_CLIENT}>+ Ajouter un nouveau client</option>
@@ -226,9 +227,9 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
             </div>
 
             {clientId === NEW_CLIENT && (
-              <div className="mt-3 grid grid-cols-1 gap-3 rounded-lg border border-stone-200 p-3 dark:border-stone-600 sm:grid-cols-3">
+              <div className="mt-3 grid grid-cols-1 gap-3 rounded-lg border border-border p-3 sm:grid-cols-3">
                 <div>
-                  <label className="block text-xs font-medium text-stone-700 dark:text-stone-300">Nom</label>
+                  <label className="block text-xs font-medium text-fg">Nom</label>
                   <input
                     className={inputClass}
                     value={newClient.name}
@@ -238,7 +239,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-stone-700 dark:text-stone-300">Courriel</label>
+                  <label className="block text-xs font-medium text-fg">Courriel</label>
                   <input
                     className={inputClass}
                     type="email"
@@ -248,7 +249,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-stone-700 dark:text-stone-300">Téléphone</label>
+                  <label className="block text-xs font-medium text-fg">Téléphone</label>
                   <input
                     className={inputClass}
                     type="tel"
@@ -261,7 +262,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
             )}
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Service</label>
+              <label className="block text-sm font-medium text-fg">Service</label>
               <select className={inputClass} value={serviceId} onChange={(e) => setServiceId(e.target.value)} disabled={readOnly}>
                 {services.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -275,22 +276,22 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
 
         <div className="mt-4 grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Date</label>
+            <label className="block text-sm font-medium text-fg">Date</label>
             <input className={inputClass} type="date" value={date} onChange={(e) => setDate(e.target.value)} required disabled={readOnly} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">{isBlock ? 'Début' : 'Heure'}</label>
+            <label className="block text-sm font-medium text-fg">{isBlock ? 'Début' : 'Heure'}</label>
             <input className={inputClass} type="time" value={time} onChange={(e) => setTime(e.target.value)} required disabled={readOnly} />
           </div>
           <div>
             {isBlock ? (
               <>
-                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Fin</label>
+                <label className="block text-sm font-medium text-fg">Fin</label>
                 <input className={inputClass} type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required disabled={readOnly} />
               </>
             ) : (
               <>
-                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Statut</label>
+                <label className="block text-sm font-medium text-fg">Statut</label>
                 <select className={inputClass} value={status} onChange={(e) => setStatus(e.target.value as AppointmentStatus)} disabled={readOnly}>
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
@@ -304,7 +305,7 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">Notes internes</label>
+          <label className="block text-sm font-medium text-fg">Notes internes</label>
           <textarea className={inputClass} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} disabled={readOnly} />
         </div>
 
@@ -324,22 +325,22 @@ export function AppointmentModal({ state, clients, services, ctx, canEdit = true
           </div>
         )}
 
-        {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mt-4 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}
 
         <div className="mt-6 flex items-center justify-between">
           {editing && !readOnly ? (
-            <button type="button" onClick={onDelete} disabled={busy} className="text-sm text-red-600 hover:underline disabled:opacity-60">
+            <button type="button" onClick={onDelete} disabled={busy} className="text-sm text-danger hover:underline disabled:opacity-60">
               Supprimer
             </button>
           ) : (
             <span />
           )}
           <div className="flex gap-3">
-            <button type="button" onClick={onCancel} className="rounded-lg px-4 py-2 text-sm text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-700">
+            <button type="button" onClick={onCancel} className="ui-btn-ghost">
               {readOnly ? 'Fermer' : 'Annuler'}
             </button>
             {!readOnly && (
-              <button type="submit" disabled={busy} className="rounded-lg bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900 disabled:opacity-60">
+              <button type="submit" disabled={busy} className="ui-btn-primary">
                 {busy ? 'Enregistrement…' : 'Enregistrer'}
               </button>
             )}

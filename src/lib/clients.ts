@@ -7,6 +7,7 @@ export type Client = {
   phone: string | null
   email: string | null
   notes: string | null
+  barber_id: string | null
   created_at: string
 }
 
